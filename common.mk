@@ -330,6 +330,9 @@ DEVICE_MANIFEST_FILE := \
     $(AUDIO_HAL_DIR)/configs/sun/manifest_audio_qti_services.xml \
     $(COMMON_PATH)/vintf/manifest_sun.xml
 
+# Virtualization service
+$(call inherit-product, packages/modules/Virtualization/apex/product_packages.mk)
+
 # WiFi
 PRODUCT_PACKAGES += \
     android.hardware.wifi-service \
