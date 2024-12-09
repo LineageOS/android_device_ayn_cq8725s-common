@@ -620,3 +620,6 @@ subsystem mem_buf_vm
 # Fingerprint
 /dev/focaltech_fp               0664   system     system
 /dev/focaltech_fpspi            0664   system     system
+
+# Battery
+/sys/class/qcom-battery  charging_enabled  0660  system  system
