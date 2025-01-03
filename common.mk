@@ -26,5 +26,8 @@ PRODUCT_SHIPPING_API_LEVEL := 35
 PRODUCT_SOONG_NAMESPACES += \
     $(LOCAL_PATH)
 
+# Storage
+$(call inherit-product, $(SRC_TARGET_DIR)/product/emulated_storage.mk)
+
 # Inherit from the proprietary files makefile.
 $(call inherit-product, vendor/ayn/cq8725s-common/cq8725s-common-vendor.mk)
