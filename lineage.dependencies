@@ -1,5 +1,9 @@
 [
   {
+    "repository": "android_hardware_ayn",
+    "target_path": "hardware/ayn"
+  },
+  {
     "repository": "android_kernel_ayn_cq8725s",
     "target_path": "kernel/ayn/cq8725s"
   },
