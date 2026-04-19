@@ -29,6 +29,19 @@ TARGET_CPU_ABI := arm64-v8a
 TARGET_CPU_VARIANT := generic
 TARGET_CPU_VARIANT_RUNTIME := oryon
 
+# Audio
+AUDIO_FEATURE_ENABLED_DLKM := true
+AUDIO_FEATURE_ENABLED_EXTENDED_COMPRESS_FORMAT := true
+AUDIO_FEATURE_ENABLED_GKI := true
+AUDIO_FEATURE_ENABLED_INSTANCE_ID := true
+AUDIO_FEATURE_ENABLED_MCS := true
+AUDIO_FEATURE_ENABLED_SVA_MULTI_STAGE := true
+BOARD_SUPPORTS_OPENSOURCE_STHAL := true
+BOARD_SUPPORTS_SOUND_TRIGGER := true
+BOARD_USES_ALSA_AUDIO := true
+TARGET_PROVIDES_AUDIO_HAL := true
+TARGET_PROVIDES_LIBAR_PAL := true
+
 # Boot
 BOARD_BOOT_HEADER_VERSION := 4
 BOARD_MKBOOTIMG_ARGS += --header_version $(BOARD_BOOT_HEADER_VERSION)
@@ -54,7 +67,8 @@ DEVICE_FRAMEWORK_COMPATIBILITY_MATRIX_FILE := \
     hardware/qcom-caf/common/vendor_framework_compatibility_matrix.xml
 DEVICE_MATRIX_FILE := hardware/qcom-caf/common/compatibility_matrix_aidl.xml
 DEVICE_MANIFEST_FILE := \
-    $(COMMON_PATH)/vintf/manifest_sun.xml
+    $(COMMON_PATH)/vintf/manifest_sun.xml \
+    hardware/qcom-caf/sm8750/audio/primary-hal/configs/sun/manifest_audio_qti_services.xml
 
 # Init boot
 BOARD_INIT_BOOT_HEADER_VERSION := 4
