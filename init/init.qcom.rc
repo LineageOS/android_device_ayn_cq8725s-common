@@ -68,6 +68,7 @@ import /vendor/etc/init/hw/init.qcom.factory.rc
 on early-init
     mount tracefs tracefs /sys/kernel/tracing
     chmod 0755 /sys/kernel/tracing
+    chmod 0777 /sys/kernel/debug
 
   # create symlink for vendor mount points
     symlink /vendor/firmware_mnt /firmware
@@ -77,11 +78,9 @@ on early-init
   # Change ownership of sysfs power control node
     chown system graphics /sys/class/drm/card0/device/power/control
 
-    #Disable UFS clock scaling
+    #Disable UFS LPM to save boot time
     write /sys/bus/platform/devices/1d84000.ufshc/clkscale_enable 0
-    #Disable UFS auto_hibern8
     write /sys/bus/platform/devices/1d84000.ufshc/auto_hibern8 0
-    #Disable UFS clock gating
     write /sys/bus/platform/devices/1d84000.ufshc/clkgate_enable 0
 
     chown root system /dev/kmsg
@@ -100,6 +99,9 @@ on init
     chown root system /sys/fs/cgroup/memory/bg/tasks
     chmod 0660 /sys/fs/cgroup/memory/bg/tasks
 
+    chmod 0666 /dev/block/sda2
+    chmod 0666 /dev/block/sda3
+
 on post-fs
 
 on early-boot
@@ -111,6 +113,7 @@ on early-boot
 
     chown system system /mnt/vendor/persist/data/pfm/licenses
     chmod 0775 /mnt/vendor/persist/data/pfm/licenses
+    chmod 0666 /sys/devices/soc0/select_image
     chown system system /mnt/vendor/persist/data/pfm/licenses/store_0
     chmod 0664 /mnt/vendor/persist/data/pfm/licenses/store_0
     chown system system /mnt/vendor/persist/data/pfm/licenses/store_1
@@ -147,6 +150,9 @@ on boot
     chown bluetooth bluetooth /sys/devices/platform/msm_serial_hs.0/clock
     chmod 0660 /sys/devices/platform/msm_serial_hs.0/clock
 
+    chmod 0666 /sys/class/power_supply/battery/input_suspend
+
+    chmod 0777 /dev/ttyHS1
     chmod 0660 /dev/ttyHS2
     chown bluetooth bluetooth /dev/ttyHS2
 
@@ -194,7 +200,9 @@ on boot
     # bond0 used by FST Manager
     chown wifi wifi /sys/class/net/bond0/bonding/queue_id
 
-    # Allow access to dload sysfs node
+    # Allow access to emmc rawdump block partition and dload sysfs node
+    chown root system /dev/block/bootdevice/by-name/rawdump
+    chmod 0660 /dev/block/bootdevice/by-name/rawdump
     chown root system /sys/kernel/dload/emmc_dload
     chmod 0660 /sys/kernel/dload/emmc_dload
     chown root system /dev/block/bootdevice/by-name/ramdump
@@ -240,9 +248,16 @@ on boot
     # Create vpp directory
     mkdir /mnt/vendor/persist/vpp 0770 media media
 
+    # Create hexlp directory
+    mkdir /mnt/vendor/persist/hexlp 0770 media media
 
     # Create hvdcp_opti directory
     mkdir /mnt/vendor/persist/hvdcp_opti 0770 root system
+
+    mkdir /mnt/vendor/persist/FTM_AP/ 0777 system system
+	
+    chown  system system  /mnt/vendor/persist/FTM_AP/mmi.res
+    chmod 0644 /mnt/vendor/persist/FTM_AP/mmi.res
 
     # limit discard size to 128MB in order to avoid long IO latency
     write /sys/block/sda/queue/discard_max_bytes 134217728
@@ -292,6 +307,10 @@ on post-fs-data
     mkdir /data/vendor/wifi/wpa_supplicant 0770 wifi wifi
     mkdir /data/vendor/wifi/wpa 0770 wifi wifi
     mkdir /data/vendor/wifi/wpa/sockets 0770 wifi wifi
+
+    #create port-bridge log dir
+    mkdir /data/vendor/port_bridge 0770 radio radio
+    chmod 0777 /data/vendor/port_bridge
 
     # Create the directories used by CnE subsystem
     mkdir /data/vendor/connectivity 0771 radio radio
@@ -412,6 +431,9 @@ on post-fs-data
     # Create vpp directory
     mkdir /data/vendor/vpp 0770 media media
 
+    # Create hexlp directory
+    mkdir /data/vendor/hexlp 0770 media media
+
     #Create dir for TUI
     mkdir /data/vendor/tui 0700 system drmrpc
 
@@ -484,11 +506,9 @@ on property:persist.vendor.sys.rawdump_copy=0
 
 on property:sys.boot_completed=1
     write /dev/kmsg "Boot completed "
-    #Enable UFS clock scaling back
+    #Enable UFS LPM back
     write /sys/bus/platform/devices/1d84000.ufshc/clkscale_enable 1
-    #Enable UFS auto_hibern8 back
     write /sys/bus/platform/devices/1d84000.ufshc/auto_hibern8 5000
-    #Enable UFS clock gating back
     write /sys/bus/platform/devices/1d84000.ufshc/clkgate_enable 1
     #Reset read ahead for dm-0 and dm-1 to 512kb
     write /sys/block/dm-0/queue/read_ahead_kb 512
@@ -597,8 +617,52 @@ service wifi_ftmd /system/vendor/bin/wifi_ftmd
     disabled
     oneshot
 
+on property:vendor.wifi.start=false
+    start vendor.wlan_config_down
+    stop vendor.wifi_ftmdaemon
+
+on property:vendor.wifi.start=true
+    start vendor.wlan_config_up
+    chmod 777 /sys/module/kiwi_v2/parameters/con_mode
+    write /sys/module/kiwi_v2/parameters/con_mode 5
+    start vendor.wifi_ftmdaemon
+
+on property:vendor.bt.start=false	
+    stop vendor.bt_ftmdaemon	
+
+on property:vendor.bt.start=true	
+    start vendor.bt_ftmdaemon	
+
+service vendor.wlan_config_down /vendor/bin/ftm_wlan_config 2
+    class main
+    user root
+    group root
+    disabled
+    oneshot
+
+service vendor.wlan_config_up /vendor/bin/ftm_wlan_config 1
+    class main
+    user root
+    group root
+    disabled
+    oneshot
+
+service vendor.wifi_ftmdaemon /vendor/bin/ftmdaemon -n	-dd
+    class main
+    user root
+    group root
+    disabled
+    oneshot
+
+service vendor.bt_ftmdaemon /vendor/bin/ftmdaemon -n	
+    class main	
+    user root	
+    group root	
+    disabled	
+    oneshot		
+
 on property:vendor.wifi.ftmd.load=true
-    insmod /system/lib/modules/pronto/pronto_wlan.ko con_mode=5
+    insmod /vendor/lib/modules/qca_cld3_kiwi_v2.ko con_mode_ftm=5
 
 service cnss-daemon /system/vendor/bin/cnss-daemon -n -l
     class late_start
@@ -631,11 +695,6 @@ service mlid /vendor/bin/mlid
     user gps
     group gps
     socket mlid stream 0666 gps gps
-
-service loc_launcher /system/vendor/bin/loc_launcher
-    class late_start
-    user gps
-    group gps
 
 service qcom-sh /vendor/bin/init.qcom.sh
     class late_start
@@ -790,6 +849,10 @@ service esepmdaemon /system/vendor/bin/esepmdaemon
     group nfc
 
 on charger
+    #Enable UFS LPM back
+    write /sys/bus/platform/devices/1d84000.ufshc/clkscale_enable 1
+    write /sys/bus/platform/devices/1d84000.ufshc/auto_hibern8 5000
+    write /sys/bus/platform/devices/1d84000.ufshc/clkgate_enable 1
     setprop persist.sys.usb.config mass_storage
     start qcom-post-boot
 

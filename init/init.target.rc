@@ -27,7 +27,7 @@
 #
 #
 # Changes from Qualcomm Innovation Center are provided under the following license:
-# Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+# Copyright (c) 2022, 2024 Qualcomm Innovation Center, Inc. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted (subject to the limitations in the
@@ -76,21 +76,27 @@ on early-fs
     start vold
 
 on fs
-    start hwservicemanager
     mount_all --early
     chown root system /mnt/vendor/persist
     chmod 0771 /mnt/vendor/persist
     restorecon_recursive /mnt/vendor/persist
-    mkdir /mnt/vendor/persist/secnvm 0770 system system
     mkdir /mnt/vendor/persist/data 0700 system system
 
 on post-fs
     #Execute virtualization manager
-    enable vendor.qvirtmgr
-    start  vendor.qvirtmgr
+    on property:ro.vendor.vm.ssr.enable=
+        enable vendor.qvirtservice_rs
+        start  vendor.qvirtservice_rs
+    on property:ro.vendor.vm.ssr.enable=false
+        enable vendor.qvirtservice_rs
+        start  vendor.qvirtservice_rs
+    on property:ro.vendor.vm.ssr.enable=true
+        enable vendor.qvirtservice_rs
+        start  vendor.qvirtservice_rs
+        enable vendor.qvirtvendorservice
+        start  vendor.qvirtvendorservice
 
 on late-fs
-    wait_for_prop hwservicemanager.ready true
     #exec_start wait_for_keymaster
     mount_all --late
 
@@ -100,10 +106,11 @@ on post-fs-data
     write /sys/kernel/cnss/fs_ready 1
 
 on early-boot
+    setprop ro.surface_flinger.supports_background_blur ${vendor.display.supports_background_blur}
     verity_update_state
 
 on boot
-    write /dev/cpuset/audio-app/cpus 1-2
+    write /dev/cpuset/audio-app/cpus 0-1
     chown system /sys/devices/platform/soc/990000.i2c/i2c-0/0-0038/trusted_touch_enable
     chmod 0660 /sys/devices/platform/soc/990000.i2c/i2c-0/0-0038/trusted_touch_enable
     chown system /sys/devices/platform/soc/990000.spi/spi_master/spi0/spi0.0/trusted_touch_enable
@@ -120,8 +127,6 @@ on property:vendor.display.lcd_density=640
 on init && property:ro.boot.mode=charger
     wait_for_prop vendor.all.modules.ready 1
     mount_all /vendor/etc/charger_fw_fstab.qti --early
-    wait /sys/kernel/boot_adsp/boot
-    write /sys/kernel/boot_adsp/boot 1
 
 on charger
     start vendor.power_off_alarm
@@ -152,10 +157,10 @@ service vendor.per_proxy /vendor/bin/pm-proxy
     group system
     disabled
 
-service vendor.mdm_helper /vendor/bin/mdm_helper
-    class core
-    group system wakelock
-    disabled
+#service vendor.mdm_helper /vendor/bin/mdm_helper
+#    class core
+#    group system wakelock
+#    disabled
 
 service vendor.mdm_launcher /vendor/bin/sh /vendor/bin/init.mdm.sh
     class core
@@ -171,28 +176,3 @@ on property:sys.shutdown.requested=*
 on early-boot && property:persist.vendor.pcie.boot_option=*
     write /sys/bus/platform/devices/1c00000.qcom,pcie/debug/boot_option ${persist.vendor.pcie.boot_option}
     write /sys/bus/platform/devices/1c08000.qcom,pcie/debug/boot_option ${persist.vendor.pcie.boot_option}
-
-service fan_control_turn_on /vendor/bin/fan_service 1
-    class late_start
-    user root
-    disabled
-    oneshot
-
-service fan_control_turn_off /vendor/bin/fan_service 0
-    class late_start
-    user root
-    disabled
-    oneshot
-
-service vendor.audio-hal /vendor/bin/hw/android.hardware.audio.service
-    override
-    class hal
-    user audioserver
-    # media gid needed for /dev/fm (radio) and for /data/misc/media (tee)
-    group audio camera drmrpc inet media mediadrm net_bt net_bt_admin net_bw_acct oem_2901 wakelock oem_2912
-    capabilities BLOCK_SUSPEND SYS_NICE
-    # setting RLIMIT_RTPRIO allows binder RT priority inheritance
-    rlimit rtprio 10 10
-    ioprio rt 4
-    task_profiles ProcessCapacityHigh HighPerformance
-    onrestart restart audioserver
