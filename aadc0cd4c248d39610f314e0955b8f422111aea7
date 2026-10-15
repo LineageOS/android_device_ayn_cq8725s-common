@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e378a7ce_12aca7e7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 29242
+      },
+      "writtenOn": "2026-10-15T19:10:16Z",
+      "side": 1,
+      "message": "https://review.lineageos.org/c/LineageOS/android_device_ayn_qcs8550-common/+/502076\n\nShould be applied similarly as the above",
+      "revId": "aadc0cd4c248d39610f314e0955b8f422111aea7",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
+    }
+  ]
+}
