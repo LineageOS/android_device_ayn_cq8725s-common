@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d5d76bd2_8584a6ec",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 38023
+      },
+      "writtenOn": "2026-10-17T15:38:02Z",
+      "side": 1,
+      "message": "```suggestion\ncq8725s-common: Set Wi-Fi flags\n```",
+      "range": {
+        "startLine": 7,
+        "startChar": 20,
+        "endLine": 7,
+        "endChar": 24
+      },
+      "revId": "58911a46992113c181925a62eb07d1f6300ea9e6",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aa970f67_9d944f04",
+        "filename": "BoardConfigCommon.mk",
+        "patchSetId": 3
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 38023
+      },
+      "writtenOn": "2026-10-17T15:38:02Z",
+      "side": 1,
+      "message": "```suggestion\n# Wi-Fi\n```",
+      "range": {
+        "startLine": 181,
+        "startChar": 2,
+        "endLine": 181,
+        "endChar": 6
+      },
+      "revId": "58911a46992113c181925a62eb07d1f6300ea9e6",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
+    }
+  ]
+}
