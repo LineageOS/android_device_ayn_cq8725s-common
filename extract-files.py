@@ -71,17 +71,6 @@ blob_fixups: blob_fixups_user_type = {
         .replace_needed('libaudio_aidl_conversion_common_ndk.so', 'libaudio_aidl_conversion_common_ndk_prebuilt.so')
         .replace_needed('libbluetooth_audio_session_aidl.so', 'libbluetooth_audio_session_aidl_prebuilt.so'),
     (
-        'vendor/lib64/libcwb_qcom_aidl.so',
-        'vendor/lib64/libhwcsensor.so',
-        'vendor/lib64/libsdmclient.so',
-    ): blob_fixup()
-        .replace_needed('vendor.qti.hardware.display.config-V11-ndk.so', 'vendor.qti.hardware.display.config-V12-ndk.so'),
-    (
-        'vendor/lib64/libloc_api_v02.so',
-        'vendor/lib64/libloc_core.so',
-    ): blob_fixup()
-        .add_needed('libbase.so'),
-    (
         'vendor/lib64/libqcodec2_core.so',
     ): blob_fixup()
         .replace_needed('android.hardware.graphics.common-V5-ndk', 'android.hardware.graphics.common-V7-ndk'),
