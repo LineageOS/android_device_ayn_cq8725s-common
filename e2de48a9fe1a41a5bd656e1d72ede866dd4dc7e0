@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a957b4d2_b9a8790f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4550
+      },
+      "writtenOn": "2026-10-29T09:58:28Z",
+      "side": 1,
+      "message": "All this script does for this platform is setting start_msm_irqbalance, not needed here, or you need to adapt the commit to remove pasr stuff if they are in other places",
+      "revId": "e2de48a9fe1a41a5bd656e1d72ede866dd4dc7e0",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
+    }
+  ]
+}
