@@ -262,6 +262,7 @@ PRODUCT_CHARACTERISTICS := device
 # Sensors
 PRODUCT_PACKAGES += \
     android.hardware.sensors-service.multihal \
+    sensors.ayn \
     sensors.dynamic_sensor_hal
 
 PRODUCT_COPY_FILES += \
